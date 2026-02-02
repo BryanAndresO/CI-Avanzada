@@ -1,0 +1,30 @@
+#Nombre que se le da
+name: CI
+
+#Trigger - El accioandor
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Ejecutar las pruebas
+        run: ./gradlew test
+
+      - name: Construir
+        run: ./gradlew build
