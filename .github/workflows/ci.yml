@@ -8,7 +8,8 @@ on:
       - main
   pull_request:
     branches:
-
+      branches:
+        - '**' # Esto activa el job para PRs en CUALQUIER rama
 
 jobs:
   build-test:
