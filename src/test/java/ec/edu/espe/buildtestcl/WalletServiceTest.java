@@ -107,7 +107,7 @@ public class WalletServiceTest {
     @Test
     void withdraw_insufficientFounds_shouldThrow_andNotSave(){
         //Arrange
-        Wallet wallet = new Wallet("123","baortiz7@espe.edu.ec",300.0);
+        Wallet wallet = new Wallet("baortiz7@espe.edu.ec",300.0);
         String walletId = wallet.getId();
 
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
@@ -118,4 +118,6 @@ public class WalletServiceTest {
         assertEquals("Fondos insuficientes", exception.getMessage());
         verify(walletRepository, never()).save(any());
     }
+
+    
 }

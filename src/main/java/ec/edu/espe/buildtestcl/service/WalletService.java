@@ -35,7 +35,8 @@ public class WalletService {
             throw new IllegalStateException("Wallet already exists");
         }
 
-        Wallet wallet = new Wallet(null, ownerEmail, initialBalance);
+        // Usar el constructor que genera el ID automáticamente
+        Wallet wallet = new Wallet(ownerEmail, initialBalance);
         Wallet savedWallet = walletRepository.save(wallet);
 
         return new WalletResponse(savedWallet.getId(), savedWallet.getBalance());

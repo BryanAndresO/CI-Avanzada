@@ -1,12 +1,22 @@
 package ec.edu.espe.buildtestcl.model;
 
+import java.util.UUID;
+
 public class Wallet {
     private final String id;
     private final String ownerEmail;
     private double balance;
 
+    // Constructor con ID proporcionado (útil cuando se recupera de la base de datos)
     public Wallet(String id, String ownerEmail, double balance) {
         this.id = id;
+        this.ownerEmail = ownerEmail;
+        this.balance = balance;
+    }
+
+    // Constructor sin ID - genera UUID automáticamente
+    public Wallet(String ownerEmail, double balance) {
+        this.id = UUID.randomUUID().toString();
         this.ownerEmail = ownerEmail;
         this.balance = balance;
     }
