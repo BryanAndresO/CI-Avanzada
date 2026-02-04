@@ -1,0 +1,90 @@
+# =============================================================================
+# Workflow de Despliegue Continuo (CD)
+# =============================================================================
+# Este workflow se ejecuta automáticamente cuando hay un push a la rama main.
+# Su objetivo es:
+#   1. Ejecutar las pruebas automatizadas
+#   2. Construir el proyecto con Gradle
+#   3. Generar el archivo ejecutable (.jar)
+#   4. Publicar el .jar como artefacto descargable
+# =============================================================================
+
+name: CD
+
+# -----------------------------------------------------------------------------
+# TRIGGER: Define CUÁNDO se ejecuta este workflow
+# -----------------------------------------------------------------------------
+# Solo se ejecuta cuando hay un push a la rama main.
+# Esto garantiza que solo se generen artefactos de código "aprobado".
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # JOB: build-and-deploy
+  # ---------------------------------------------------------------------------
+  # Este job ejecuta todos los pasos del pipeline de CD
+  build-and-deploy:
+    runs-on: ubuntu-latest  # Usa un runner de Ubuntu (Linux) proporcionado por GitHub
+
+    steps:
+      # -----------------------------------------------------------------------
+      # PASO 1: Clonar el repositorio
+      # -----------------------------------------------------------------------
+      # Descarga el código fuente del repositorio a la máquina del runner.
+      # Sin este paso, el runner no tendría acceso a tu código.
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # PASO 2: Configurar Java 17
+      # -----------------------------------------------------------------------
+      # Instala y configura Java 17 (Temurin/OpenJDK) en el runner.
+      # Es necesario porque Gradle necesita Java para compilar tu proyecto.
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'   # Distribución de OpenJDK (gratuita y confiable)
+          java-version: '17'        # Versión de Java que usa tu proyecto
+
+      # -----------------------------------------------------------------------
+      # PASO 3: Dar permisos de ejecución a Gradle Wrapper
+      # -----------------------------------------------------------------------
+      # Asegura que gradlew sea ejecutable (por si acaso).
+      - name: Hacer gradlew ejecutable
+        run: chmod +x ./gradlew
+
+      # -----------------------------------------------------------------------
+      # PASO 4: Ejecutar las pruebas automatizadas
+      # -----------------------------------------------------------------------
+      # Corre todos los tests con JUnit. Si alguna prueba falla, el pipeline
+      # se detiene aquí y NO se genera el artefacto.
+      # Esto garantiza que solo se publiquen versiones "que funcionan".
+      - name: Ejecutar pruebas
+        run: ./gradlew test
+
+      # -----------------------------------------------------------------------
+      # PASO 5: Construir el proyecto y generar el JAR
+      # -----------------------------------------------------------------------
+      # Compila el código y genera el archivo .jar ejecutable.
+      # El JAR se guarda en: build/libs/BuildTestCl-0.0.1-SNAPSHOT.jar
+      - name: Construir el proyecto
+        run: ./gradlew build
+
+      # -----------------------------------------------------------------------
+      # PASO 6: Publicar el artefacto (JAR)
+      # -----------------------------------------------------------------------
+      # Sube el archivo .jar como "artefacto" del workflow.
+      # Esto permite descargarlo desde la pestaña Actions de GitHub.
+      # 
+      # - name: Nombre que verás en GitHub para descargar
+      # - path: Ruta donde Gradle genera el JAR
+      # - retention-days: Cuántos días se guarda el artefacto (90 días máximo gratis)
+      - name: Publicar artefacto JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: BuildTestCl-JAR           # Nombre del artefacto en GitHub
+          path: build/libs/*.jar          # Sube todos los .jar generados
+          retention-days: 30              # Se guarda por 30 días
