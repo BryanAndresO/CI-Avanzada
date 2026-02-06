@@ -76,4 +76,16 @@ public class WalletService {
         walletRepository.save(wallet);
         return wallet.getBalance();
     }
+
+    /**
+     * Consulta el balance actual de una wallet
+     * @param walletId ID de la wallet a consultar
+     * @return Balance actual de la wallet
+     * @throws IllegalArgumentException si la wallet no existe
+     */
+    public double getBalance(String walletId) {
+        Wallet wallet = walletRepository.findById(walletId)
+            .orElseThrow(() -> new IllegalArgumentException("Wallet not found"));
+        return wallet.getBalance();
+    }
 }
